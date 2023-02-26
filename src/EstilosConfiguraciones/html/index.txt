@@ -271,3 +271,5 @@ https://cdn.jsdelivr.net/npm/vanilla-rangeslider@1.0.0/css/rangeslider.min.css
       </div>
     </div>
   </div>
+  
+  prueba de guardado
