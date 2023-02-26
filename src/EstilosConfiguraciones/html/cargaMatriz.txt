@@ -1,0 +1,550 @@
+
+<link href="../EstilosConfiguraciones/CSS/style.css" rel="stylesheet">
+
+<link href="../EstilosConfiguraciones/CSS/bootstrap.min.css" rel="stylesheet">
+<script src="../EstilosConfiguraciones/JS/jquery-3.4.1.min.js"></script>
+<script src="../EstilosConfiguraciones/JS/bootstrap.min.js"></script>
+<script src="../EstilosConfiguraciones/JS/endpoint.js"></script>
+
+
+<link href="../EstilosConfiguraciones/CSS/datepicker.css" rel="stylesheet">
+<script src="../EstilosConfiguraciones/JS/bootstrap-datepicker.js"></script>
+
+
+<script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+
+<link rel="stylesheet" href="../EstilosConfiguraciones/css/dataTables.bootstrap4.min.css" />
+<script src="../EstilosConfiguraciones/js/jquery.dataTables4.min.js"></script>
+<script src="../EstilosConfiguraciones/js/dataTables.bootstrap4.min.js"></script>
+
+
+<link href="../EstilosConfiguraciones/css/jquery.toast.css" rel="stylesheet">
+<script src="../EstilosConfiguraciones/js/jquery.toast.js"></script>
+<style>
+    #loading {
+        background: #000000e0;
+        position: fixed;
+        text-align: center;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        right: 0;
+        left: 0;
+        z-index: 9999999;
+    }
+
+    .loader {
+        padding: 30px;
+        border: 10px solid #00aeff;
+        box-shadow: 0 0 5px 1px #00aeff;
+        border-right-color: #0b2739;
+        border-radius: 50%;
+        animation: rotate 1s infinite linear;
+        position: absolute;
+        top: 45%;
+        left: 45%;
+    }
+
+    @keyframes rotate {
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    .b-btn-primary-action,
+    .b-btn-primary-action:hover {
+        color: #fff;
+        background-color: #0b2739 !important;
+        border-color: #0b2739 !important;
+    }
+</style>
+
+
+<style>
+    .card-header {
+        background-color: #222;
+    }
+
+    .btn-info {
+        color: #fff;
+        background-color: #5bc0de !important;
+        border-color: #46b8da !important;
+    }
+
+    .btn-success {
+        color: #fff;
+        background-color: #5cb85c !important;
+        border-color: #4cae4c !important;
+    }
+
+    .btn-default {
+        color: #333;
+        background-color: #fff !important;
+        border-color: #ccc !important;
+    }
+
+    .btn {
+        min-width: auto !important;
+    }
+
+    .hide-button .btn-eliminar {
+        display: none;
+    }
+</style>
+
+
+
+
+
+<div id="loading">
+    <div class='loader'></div>
+</div>
+
+<section id="menu-section">
+
+</section>
+<script>
+    obtenerComponentes();
+    function obtenerComponentes() {
+        $("#menu-section").load("../EstilosConfiguraciones/html/menu.txt");
+    }
+</script>
+
+
+<section>
+    <div class="container mt-3">
+        <div class="card shadow">
+            <div class="card-header text-center">
+                <h5 class="text-white mb-0">Matriz de Relación 360</h5>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="ddlCodigoMatriz" class="control-label font-weight-bold">Código Matriz:</label>
+                    <select id="ddlCodigoMatriz" class="form-control form-control-sm border" onchange="cambioMatriz()">
+                        <option value="">---Seleeccione---</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="ddlCodigoMatriz" class="control-label font-weight-bold">Leer excel
+                        colaboradores:</label>
+                    <div class="input-group">
+                        <input type="file" class="form-control form-control-file border text-center" id="txtUsuarios"
+                            accept=".xls,.xlsx">
+                        <div class="input-group-append">
+                            <button type="button" class="btn btn-secondary" id="btn-cargarArchivo"
+                                onclick="LeerArchivoExcel() ">Cargar archivo</button>
+                        </div>
+                    </div>
+                    <a href="https://ayasacomec.sharepoint.com/sites/Evaluacin360/PlantillaCargaColaborador/PlantillaCargaEvaluador.xlsx"
+                        download style="font-size: 12px;">Descargar plantilla</a>
+                </div>
+
+            </div>
+            <div class="card-footer text-center">
+                <button type="button" class="btn-acciones btn btn-info" onclick="validarGuardar()">Guardar</button>
+                <button type="button" class="btn-acciones btn btn-success" onclick="validarEnviar()">Guardar y
+                    Generar</button>
+                <a href="../SitePages/HomeEvaluacion360.aspx" class="btn btn-danger text-white">Cancelar</a>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid mt-5 bg-white shadow" id="div-table" style="display: none;">
+        <div class="row py-2">
+            <div class="col-md-12 ">
+                <table class="table table-sm table-striped table-bordered w-100" id="tableUsuarios"></table>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    var _usuriosBD = []
+    var _matrizEvaluadores = []
+    var _roles = []
+    var _dataExcel = []
+    var _idRegistroExistente = ''
+    var _existeRegistro = ''
+
+    function pageLoadCargaMatriz() {
+        leerdataUsuarios()
+        consultarRoles()
+        matrizEvaluadores()
+        $('#loading').hide()
+    }
+    window.onload = pageLoadCargaMatriz()
+
+
+    function consultarRoles() {
+        var result = getDataSp({ listaNombre: 'Roles', filter: `Estado eq 'Activo'` })
+        if (result.ok) {
+            _roles = result.data.results
+        }
+    }
+
+    function matrizEvaluadores() {
+        var result = getDataSp({ listaNombre: 'MatrizEvaluadores', filter: `Estado eq 'Activo'` })
+        if (result.ok) {
+            _matrizEvaluadores = result.data.results
+
+            _matrizEvaluadores.forEach(e => {
+                var title = `${e.Codigo} - ${e.Title || ''}`
+                $('#ddlCodigoMatriz').append(`<option value="${e.Id}">${title}</option>`)
+            });
+
+        }
+    }
+
+    function LeerArchivoExcel() {
+        $('#loading').show()
+        var target = $('#txtUsuarios')[0];
+        var files_Cont = target.files;
+        if (files_Cont.length === 0) {
+            mostrarMensajeError("Debe seleccionar un archivo");
+            return;
+        }
+        var filename = files_Cont[0].name;
+        var allowedExtensions = /(.xlsx|.xls)$/i;
+        if (!allowedExtensions.exec(filename)) {
+            $('#txtUsuarios').val(null)
+            mostrarMensajeError("Debe seleccionar un archivo excel");
+            return;
+        }
+        var name = target.name;
+        var hojas = [];
+        var usuariosExcel = [];
+        var data_GridP = [];
+        var render = new FileReader();
+        render.readAsArrayBuffer(target.files[0]);
+        render.onloadend = (e) => {
+            var data = new Uint8Array(e.target.result);
+            var workbook = XLSX.read(data, { type: "array" });
+
+            workbook.SheetNames.forEach(function (sheetName) {
+                var XL_row_object = XLSX.utils.sheet_to_row_object_array(
+                    workbook.Sheets[sheetName]
+                );
+                hojas.push({
+                    data: XL_row_object,
+                    sheetName,
+                });
+            });
+            usuariosExcel = hojas[0].data
+                .map(function (e, index) {
+                    return {
+                        id: Date.now() + index,
+                        emailUsuario: e["Colaborador"] || '',
+                        informacionAdicional: e["Informacion Adicional"] || '',
+                        rol: e["Rol"] || '',
+                        emailEvaluador: e["Evaluador"] || '',
+                    };
+                })
+            $('#txtUsuarios').val(null)
+            validarDataExcel(usuariosExcel)
+            $('#loading').hide()
+        }
+    }
+
+    function validarDataExcel(data) {
+        var dataValidada = []
+        data.forEach(e => {
+            var usuario = _usuriosBD.find(u => u.emailUsuario == e.emailUsuario)
+            var jefe = _usuriosBD.find(u => u.emailEvaluador == e.emailEvaluador)
+            var rol = _roles.find(r => r.Title.toLowerCase() == e.rol.toLowerCase())
+            var duplicado = _dataExcel.find(u => u.emailUsuario == e.emailUsuario)
+            var descripcionError = []
+
+            var infoEvaluador = {
+                cedula:'',
+                nombre:''
+            };
+
+            if (!usuario) {
+                descripcionError.push(`no se encuenta la información del evaluado: ${e.emailUsuario}`)
+            }
+
+            if (e.rol.toLowerCase() == 'autoevaluación') {
+                if (usuario) {
+                    infoEvaluador.cedula = usuario?.cedulaUsuario || ''
+                    infoEvaluador.nombre = usuario?.nombreUsuario || ''
+                }
+            } else {
+                if (!jefe) {
+                    descripcionError.push(`no se encuenta la información del evaluador: ${e.emailEvaluador}`)
+                } else {
+
+                    infoEvaluador.cedula = jefe ? jefe?.cedulaEvaluador : ''
+                    infoEvaluador.nombre = jefe ? jefe?.nombreEvaluador : ''
+                    
+                }
+            }
+
+
+            if (!rol) {
+                descripcionError.push(`no se encuenta la el rol: ${e.rol} `)
+            }
+
+
+            var info = {
+                id: e.id,
+                cedulaUsuario: usuario ? usuario?.cedulaUsuario : '',
+                nombreUsuario: usuario ? usuario?.nombreUsuario : '',
+                emailUsuario: e.emailUsuario,
+                cedulaEvaluador: infoEvaluador ? infoEvaluador?.cedula : '',
+                nombreEvaluador: infoEvaluador ? infoEvaluador?.nombre : '',
+                emailEvaluador: e.emailEvaluador,
+                rol: rol ? rol?.Title : '',
+                informacionAdicional: e.informacionAdicional,
+                observaciones: descripcionError.join(', '),
+                eliminar: `
+                <button type="button" class="btn btn-danger btn-sm text-white btn-eliminar" onclick="elimarRegistro('${e.id}')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill"
+                        viewBox="0 0 16 16">
+                        <path
+                            d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z" />
+                    </svg>
+                </button>        
+                `
+            }
+            if (!duplicado) {
+                dataValidada.push(info)
+            }
+        });
+
+
+        _dataExcel = [..._dataExcel, ...dataValidada]
+
+        lledarTabla()
+    }
+
+    function lledarTabla() {
+        if ($.fn.dataTable.isDataTable('#tableUsuarios')) {
+            tablet = $('#tableUsuarios').DataTable();
+            tablet.destroy();
+        }
+        $('#tableUsuarios').empty();
+        $('#tableUsuarios').DataTable({
+            data: _dataExcel,
+            columns: [
+                { data: 'eliminar', title: 'Eliminar' },
+                { data: 'nombreUsuario', title: 'Nombre evaluado' },
+                { data: 'emailUsuario', title: 'Email evaluado' },
+                { data: 'rol', title: 'Rol' },
+                { data: 'nombreEvaluador', title: 'Nombre evaluador' },
+                { data: 'emailEvaluador', title: 'Email evaluador' },
+                { data: 'informacionAdicional', title: 'Información adicional' },
+                { data: 'observaciones', title: 'Observaciones' },
+            ],
+            columnDefs: [
+                { targets: 0, className: 'text-center' },
+            ],
+            createdRow: function (row, data, index) {
+                if (data.observaciones != '') {
+                    $(row).addClass(" text-danger")
+                }
+
+                $(row).addClass(`row-${data.id}`)
+                if (_existeRegistro == 'SI') {
+                    $(row).addClass(`hide-button`)
+                }
+            },
+            language: {
+                "url": "../EstilosConfiguraciones/js/es-ES.json"
+            },
+            responsive: true
+        })
+
+
+        if (_dataExcel.length > 0) {
+            $('#div-table').show()
+        } else {
+            $('#div-table').hide()
+        }
+    }
+
+    function elimarRegistro(idRow) {
+        _dataExcel = _dataExcel.filter(e => e.id != idRow)
+        $(`.row-${idRow}`).remove()
+    }
+
+
+    function leerdataUsuarios() {
+        $.get(`${_spPageContextInfo.webAbsoluteUrl}/BDColaboradores/BDColaborador.txt`, function (data) {
+            var resourceContent = data;
+            var dataArray = data.split(';').filter(e => e != '')
+            dataArray.forEach(e => {
+                var [nombreUsuario,emailUsuario,cedulaUsuario, cargo, departamento,nombreEvaluador, emailEvaluador] = e.split(',')
+                _usuriosBD.push({ nombreUsuario,emailUsuario,cedulaUsuario, cargo, departamento,nombreEvaluador, emailEvaluador })
+            });
+        });
+    }
+
+    function cambioMatriz() {
+        $('.btn-acciones,#btn-cargarArchivo').attr('disabled', false)
+        $('.btn-acciones,#btn-cargarArchivo').removeClass('disabled')
+        _dataExcel = []
+        _idRegistroExistente = ''
+        _existeRegistro = ''
+
+        $('#loading').show()
+        if ($('#ddlCodigoMatriz').val() != '') {
+            setTimeout(() => {
+                var result = getDataSp({ listaNombre: 'DetalleEvaluadores', filter: `Codigo_MatrizId eq '${$('#ddlCodigoMatriz').val()}'`, top: 1 })
+                if (result.ok) {
+                    if (result.data.results.length > 0) {
+                        var registro = result.data.results[0]
+                        if (registro.Finalizo_Registro == 'SI') {
+                            _existeRegistro = 'SI'
+                            $('.btn-acciones,#btn-cargarArchivo').attr('disabled', true)
+                            $('.btn-acciones,#btn-cargarArchivo').addClass('disabled')
+                        }
+
+                        _idRegistroExistente = registro.Id
+                        _dataExcel = JSON.parse(registro.Detalle_Json || '[]')
+                    }
+                    lledarTabla()
+                    $('#loading').hide()
+                }
+            }, 300);
+        } else {
+            lledarTabla()
+            $('#loading').hide()
+        }
+
+
+
+
+    }
+
+
+    function validarGuardar() {
+
+        var registro = {}
+
+        if ($('#ddlCodigoMatriz').val() == '') {
+            mostrarMensajeError('Debe seleccionar un código matriz')
+            return
+        }
+        if (_dataExcel.length == 0) {
+            mostrarMensajeError('Debe ingresar al menos un colaborador')
+            return
+        }
+        $('#loading').show()
+        var matrizSeleccionada = _matrizEvaluadores.find(e => e.Id == $('#ddlCodigoMatriz').val())
+
+        registro.Title = matrizSeleccionada.Codigo
+        registro.Codigo_MatrizId = matrizSeleccionada.Id
+        registro.Detalle_Json = JSON.stringify(_dataExcel)
+
+        if (_idRegistroExistente != '') {
+            var result = actualizarRegistro(registro)
+            if (result) {
+                mostrarMensajeCorrecto('El registro se actualizo correctamente')
+            }
+        } else {
+            var result = crearRegistro(registro)
+            if (result) {
+                mostrarMensajeCorrecto('El registro se creo y actualizo correctamente')
+            }
+        }
+        $('#loading').hide()
+    }
+
+
+    function validarEnviar() {
+
+        var registro = {}
+
+        if ($('#ddlCodigoMatriz').val() == '') {
+            mostrarMensajeError('Debe seleccionar un código matriz')
+            return
+        }
+
+        if (_dataExcel.length == 0) {
+            mostrarMensajeError('Debe ingresar al menos un colaborador')
+            return
+        }
+        var listaErrores = _dataExcel.filter(e => e.observaciones != '')
+        if (listaErrores.length > 0) {
+            mostrarMensajeError('Algunos registros contienen errores')
+            return
+        }
+        $('#loading').show()
+        var matrizSeleccionada = _matrizEvaluadores.find(e => e.Id == $('#ddlCodigoMatriz').val())
+
+        registro.Title = matrizSeleccionada.Codigo
+        registro.Codigo_MatrizId = matrizSeleccionada.Id
+        registro.Detalle_Json = JSON.stringify(_dataExcel)
+        registro.Finalizo_Registro = 'SI'
+        if (_idRegistroExistente != '') {
+            var result = actualizarRegistro(registro)
+            if (result) {
+                mostrarMensajeCorrecto('El registro se genero correctamente')
+                $('#ddlCodigoMatriz').val('')
+
+            }
+        } else {
+            var result = crearRegistro(registro)
+            if (result) {
+                mostrarMensajeCorrecto('El registro se se genero correctamente')
+                $('#ddlCodigoMatriz').val('')
+            }
+        }
+        _dataExcel = []
+        _idRegistroExistente = ''
+        lledarTabla()
+        $('#loading').hide()
+    }
+
+    function actualizarRegistro(registro) {
+        var exitoso = false
+        var result = updateItemSp({ solicitudUpdate: registro, listaNombre: 'DetalleEvaluadores', idSolicitud: _idRegistroExistente })
+        if (result.ok) {
+            exitoso = true
+        }
+        return exitoso
+    }
+
+    function crearRegistro(registro) {
+        var exitoso = false
+        var result = createItemSp({ solicitudCreate: registro, listaNombre: 'DetalleEvaluadores' })
+        if (result.ok) {
+            _idRegistroExistente = result.data.d.Id
+            exitoso = true
+        }
+        return exitoso
+    }
+
+
+</script>
+
+<script>
+    function mostrarMensajeCorrecto(mensaje) {
+        $.toast().reset('all')
+        $.toast({
+            heading: 'Success',
+            text: mensaje,
+            showHideTransition: 'slide',
+            icon: 'success',
+            position: 'top-center',
+            hideAfter: 5000,
+        })
+    }
+    function mostrarMensajeError(mensaje, tiempo = 3000) {
+        $.toast().reset('all')
+        $.toast({
+            heading: 'Error',
+            text: mensaje,
+            icon: 'error',
+            loader: true,
+            loaderBg: '#fff',
+            position: 'top-center',
+            hideAfter: tiempo,
+        })
+    }
+</script>
+<!-- 
+
+    Codigo_Matriz
+    Detalle_Json
+    Finalizo_Registro
+ -->

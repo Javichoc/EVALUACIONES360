@@ -1,0 +1,338 @@
+<link href="../EstilosConfiguraciones/CSS/style.css" rel="stylesheet">
+
+<link href="../EstilosConfiguraciones/CSS/bootstrap.min.css" rel="stylesheet">
+<script src="../EstilosConfiguraciones/JS/jquery-3.4.1.min.js"></script>
+<script src="../EstilosConfiguraciones/JS/bootstrap.min.js"></script>
+<script src="../EstilosConfiguraciones/JS/endpoint.js"></script>
+
+<link href="../EstilosConfiguraciones/CSS/datepicker.css" rel="stylesheet">
+<script src="../EstilosConfiguraciones/JS/bootstrap-datepicker.js"></script>
+
+<script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+
+<link rel="stylesheet" href="../EstilosConfiguraciones/css/dataTables.bootstrap4.min.css" />
+<script src="../EstilosConfiguraciones/js/jquery.dataTables4.min.js"></script>
+<script src="../EstilosConfiguraciones/js/dataTables.bootstrap4.min.js"></script>
+
+
+<link href="../EstilosConfiguraciones/css/jquery.toast.css" rel="stylesheet">
+<script src="../EstilosConfiguraciones/js/jquery.toast.js"></script>
+<style>
+    #loading {
+        background: #000000e0;
+        position: fixed;
+        text-align: center;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        right: 0;
+        left: 0;
+        z-index: 9999999;
+    }
+
+    .loader {
+        padding: 30px;
+        border: 10px solid #00aeff;
+        box-shadow: 0 0 5px 1px #00aeff;
+        border-right-color: #0b2739;
+        border-radius: 50%;
+        animation: rotate 1s infinite linear;
+        position: absolute;
+        top: 45%;
+        left: 45%;
+    }
+
+    @keyframes rotate {
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    .b-btn-primary-action,
+    .b-btn-primary-action:hover {
+        color: #fff;
+        background-color: #0b2739 !important;
+        border-color: #0b2739 !important;
+    }
+</style>
+
+
+<style>
+    .card-header {
+        background-color: #222;
+    }
+
+    .btn-info {
+        color: #fff;
+        background-color: #5bc0de !important;
+        border-color: #46b8da !important;
+    }
+
+    .btn-success {
+        color: #fff;
+        background-color: #5cb85c !important;
+        border-color: #4cae4c !important;
+    }
+
+    .btn-default {
+        color: #333;
+        background-color: #fff !important;
+        border-color: #ccc !important;
+    }
+
+    .btn {
+        min-width: auto !important;
+    }
+
+    .hide-button .btn-eliminar {
+        display: none;
+    }
+</style>
+
+
+
+
+
+<div id="loading">
+    <div class='loader'></div>
+</div>
+
+<section id="menu-section">
+
+</section>
+<script>
+    obtenerComponentes();
+    function obtenerComponentes() {
+        $("#menu-section").load("../EstilosConfiguraciones/html/menu.txt");
+    }
+</script>
+
+
+<section>
+    <div class="container mt-3">
+        <div class="card shadow">
+            <div class="card-header text-center">
+                <h5 class="text-white mb-0">Matriz de Relación 360</h5>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="ddlCodigoMatriz" class="control-label font-weight-bold">Código Matriz:</label>
+                    <select id="ddlCodigoMatriz" class="form-control form-control-sm border" onchange="cambioMatriz()">
+                        <!-- <option value="">---Seleeccione---</option> -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="txtNuevoCodigo" class="control-label font-weight-bold">Nuevo Código Matriz:</label>
+                    <input id="txtNuevoCodigo" class="form-control form-control-sm border cls-controls" type="text">
+                </div>
+
+
+            </div>
+            <div class="card-footer text-center">
+
+                <button type="button" class="btn-acciones btn btn-success " onclick="validarEnviar()">Copiar
+                    Matriz</button>
+                    <a href="../SitePages/HomeEvaluacion360.aspx" class="btn btn-danger text-white">Cancelar</a>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid mt-5 bg-white shadow" id="div-table" style="display: none;">
+        <div class="row py-2">
+            <div class="col-md-12 ">
+                <table class="table table-sm table-striped table-bordered w-100" id="tableUsuarios"></table>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+
+    var _matrizEvaluadores = []
+    var _detalleEvaluadores = []
+
+
+    function pageLoadCargaMatriz() {
+        consultarMatrizEvaluadores()
+        consultarDetalleEvaluadores()
+        $('#loading').hide()
+    }
+    window.onload = pageLoadCargaMatriz()
+
+
+
+
+    function consultarDetalleEvaluadores() {
+        var result = getDataSp({ listaNombre: 'DetalleEvaluadores', colums: '*,Codigo_Matriz/Codigo,Codigo_Matriz/Title,Codigo_Matriz/ID', expand: 'Codigo_Matriz', filter: `Finalizo_Registro eq 'SI'` })
+        if (result.ok) {
+            _detalleEvaluadores = result.data.results
+
+            $('#ddlCodigoMatriz').empty()
+            $('#ddlCodigoMatriz').append(`<option value="">---Seleeccione---</option>`)
+            _detalleEvaluadores.forEach(e => {
+                var title = `${e?.Codigo_Matriz?.Codigo} - ${e?.Codigo_Matriz?.Title}`
+                $('#ddlCodigoMatriz').append(`<option value="${e.Id}">${title}</option>`)
+            });
+
+        }
+    }
+
+    function consultarMatrizEvaluadores() {
+        var result = getDataSp({
+            listaNombre: 'MatrizEvaluadores',
+            colums: 'Title,Codigo,Informacion,Estado,ID',
+            filter: `Estado eq 'Activo'`
+        })
+        if (result.ok) {
+            _matrizEvaluadores = result.data.results
+        }
+    }
+
+
+
+    function validarEnviar() {
+        var codigoMatriz = $('#ddlCodigoMatriz').val()
+        var nuevoCodigoMAtriz = $('#txtNuevoCodigo').val()
+
+        if (codigoMatriz == '') {
+            mostrarMensajeError('Dene seleccionar un código de matriz')
+            return
+        }
+        if (nuevoCodigoMAtriz == '') {
+            mostrarMensajeError('Dene ingresar un nuevo código de matriz')
+            return
+        }
+        var busqueda = _matrizEvaluadores.find(e => e.Codigo == nuevoCodigoMAtriz)
+
+        if (busqueda) {
+            mostrarMensajeError('Ya existe este código de matriz')
+            return
+        }
+        $('#loading').show()
+        setTimeout(() => {
+            copiarDatos()
+        }, 300);
+    }
+
+    function copiarDatos() {
+        var detalleSeleccionado = _detalleEvaluadores.find(e => e.ID == $('#ddlCodigoMatriz').val())
+
+        if (detalleSeleccionado) {
+            var matrizSeleccionada = _matrizEvaluadores.find(e => e.ID == detalleSeleccionado.Codigo_Matriz.ID)
+            if (matrizSeleccionada) {
+                var { Title, Informacion, Estado } = matrizSeleccionada
+                var matrizCopia = {
+                    Title,
+                    Informacion,
+                    Estado,
+                    Codigo: $('#txtNuevoCodigo').val()
+                }
+
+                var result = createItemSp({ solicitudCreate: matrizCopia, listaNombre: 'MatrizEvaluadores' })
+                if (result.ok) {
+                    idRegistroCreado = result.data.d.Id
+
+                    var detalleCopia = {
+                        Title: $('#txtNuevoCodigo').val(),
+                        Codigo_MatrizId: idRegistroCreado,
+                        Detalle_Json: detalleSeleccionado.Detalle_Json,
+                        Finalizo_Registro: 'NO'
+                    }
+
+                    var resultDetalle = createItemSp({ solicitudCreate: detalleCopia, listaNombre: 'DetalleEvaluadores' })
+                    if (resultDetalle.ok) {
+                        $('#ddlCodigoMatriz').val('')
+                        $('#txtNuevoCodigo').val('')
+                        lledarTabla([])
+                        consultarMatrizEvaluadores()
+                        consultarDetalleEvaluadores()
+                        $('#loading').hide()
+                        mostrarMensajeCorrecto('Se ha copiado el registro exitosamente')
+                    } else {
+                        $('#loading').hide()
+                        mostrarMensajeError(result.resultDetalle, 10000)
+                    }
+
+                } else {
+                    $('#loading').hide()
+                    mostrarMensajeError(result.message, 10000)
+                }
+
+            }
+        } else {
+            $('#loading').hide()
+        }
+
+    }
+
+
+
+</script>
+
+
+<script>
+    function cambioMatriz() {
+        var data = []
+        if ($('#ddlCodigoMatriz').val() != '') {
+            var detalleSeleccionado = _detalleEvaluadores.find(e => e.ID == $('#ddlCodigoMatriz').val())
+            data = JSON.parse(detalleSeleccionado.Detalle_Json || '[]')
+        }
+        lledarTabla(data)
+
+    }
+    function lledarTabla(data) {
+        if ($.fn.dataTable.isDataTable('#tableUsuarios')) {
+            tablet = $('#tableUsuarios').DataTable();
+            tablet.destroy();
+        }
+        $('#tableUsuarios').empty();
+        $('#tableUsuarios').DataTable({
+            data: data,
+            columns: [
+                
+                { data: 'nombreUsuario', title: 'Nombre evaluado' },
+                { data: 'emailUsuario', title: 'Email evaluado' },
+                { data: 'rol', title: 'Rol' },
+                { data: 'nombreEvaluador', title: 'Nombre evaluador' },
+                { data: 'emailEvaluador', title: 'Email evaluador' },
+                { data: 'informacionAdicional', title: 'Información adicional' },
+            ],
+            language: {
+                "url": "../EstilosConfiguraciones/js/es-ES.json"
+            },
+            responsive: true
+        })
+
+
+        if (data.length > 0) {
+            $('#div-table').show()
+        } else {
+            $('#div-table').hide()
+        }
+    }
+</script>
+
+<script>
+    function mostrarMensajeCorrecto(mensaje) {
+        $.toast().reset('all')
+        $.toast({
+            heading: 'Success',
+            text: mensaje,
+            showHideTransition: 'slide',
+            icon: 'success',
+            position: 'top-center',
+            hideAfter: 5000,
+        })
+    }
+    function mostrarMensajeError(mensaje, tiempo = 3000) {
+        $.toast().reset('all')
+        $.toast({
+            heading: 'Error',
+            text: mensaje,
+            icon: 'error',
+            loader: true,
+            loaderBg: '#fff',
+            position: 'top-center',
+            hideAfter: tiempo,
+        })
+    }
+</script>

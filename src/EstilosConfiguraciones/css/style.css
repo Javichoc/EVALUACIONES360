@@ -1,0 +1,50 @@
+#s4-titlerow {
+    display: none !important;
+}
+
+#sideNavBox {
+    display: none;
+}
+
+#contentBox {
+    margin-left: 20px !important;
+    min-width: 98.5vw !important;
+    max-width: 100vh !important;
+}
+
+#titleAreaBox {
+    visibility: none;
+}
+
+#contentRow,
+#s4-bodyContainer,
+#s4-workspace,
+.ms-core-overlay {
+    background-color: #f4f4f4 !important;
+    padding-top: 0px !important;
+}
+
+#s4-bodyContainer {
+    padding-bottom: 0 !important;
+}
+
+#contentBox {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+.ms-rte-layoutszone-inner {
+    margin: 0 !important;
+}
+
+.ms-rtestate-field {
+    background: #f4f4f4 !important;
+}
+
+.ms-webpartzone-cell {
+    margin: auto !important;
+}
+
+.ms-rte-layoutszone-inner {
+    border: 0 !important;
+}

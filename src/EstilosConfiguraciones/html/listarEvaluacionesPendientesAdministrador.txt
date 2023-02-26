@@ -1,0 +1,209 @@
+<link href="../EstilosConfiguraciones/CSS/style.css" rel="stylesheet">
+
+<link href="../EstilosConfiguraciones/CSS/bootstrap.min.css" rel="stylesheet">
+<script src="../EstilosConfiguraciones/JS/jquery-3.4.1.min.js"></script>
+<script src="../EstilosConfiguraciones/JS/bootstrap.min.js"></script>
+<script src="../EstilosConfiguraciones/JS/endpoint.js"></script>
+
+
+<link href="../EstilosConfiguraciones/CSS/datepicker.css" rel="stylesheet">
+<script src="../EstilosConfiguraciones/JS/bootstrap-datepicker.js"></script>
+
+
+<script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+
+<link rel="stylesheet" href="../EstilosConfiguraciones/css/dataTables.bootstrap4.min.css" />
+<script src="../EstilosConfiguraciones/js/jquery.dataTables4.min.js"></script>
+<script src="../EstilosConfiguraciones/js/dataTables.bootstrap4.min.js"></script>
+
+
+<link href="../EstilosConfiguraciones/css/jquery.toast.css" rel="stylesheet">
+<script src="../EstilosConfiguraciones/js/jquery.toast.js"></script>
+<style>
+    #loading {
+        background: #000000e0;
+        position: fixed;
+        text-align: center;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        right: 0;
+        left: 0;
+        z-index: 9999999;
+    }
+
+    .loader {
+        padding: 30px;
+        border: 10px solid #00aeff;
+        box-shadow: 0 0 5px 1px #00aeff;
+        border-right-color: #0b2739;
+        border-radius: 50%;
+        animation: rotate 1s infinite linear;
+        position: absolute;
+        top: 45%;
+        left: 45%;
+    }
+
+    @keyframes rotate {
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    .b-btn-primary-action,
+    .b-btn-primary-action:hover {
+        color: #fff;
+        background-color: #0b2739 !important;
+        border-color: #0b2739 !important;
+    }
+</style>
+
+
+<style>
+    .card-header {
+        background-color: #222;
+    }
+
+    .btn-info {
+        color: #fff;
+        background-color: #5bc0de !important;
+        border-color: #46b8da !important;
+    }
+
+    .btn-success {
+        color: #fff;
+        background-color: #5cb85c !important;
+        border-color: #4cae4c !important;
+    }
+
+    .btn-default {
+        color: #333;
+        background-color: #fff !important;
+        border-color: #ccc !important;
+    }
+
+    .btn {
+        min-width: auto !important;
+    }
+
+    .hide-button .btn-eliminar {
+        display: none;
+    }
+</style>
+
+
+
+
+
+<div id="loading">
+    <div class='loader'></div>
+</div>
+
+<section id="menu-section">
+
+</section>
+<script>
+    obtenerComponentes();
+    function obtenerComponentes() {
+        $("#menu-section").load("../EstilosConfiguraciones/html/menu.txt");
+    }
+</script>
+
+
+<section>
+    <div class="container-fluid mt-3">
+        <div class="card shadow">
+            <div class="card-header text-center">
+                <h5 class="text-white mb-0">Listado de Eventos de Evaluación</h5>
+            </div>
+            <div class="card-body">
+                <div class="row py-2">
+                    <div class="col-md-12 ">
+                        <table class="table table-sm table-striped table-bordered w-100" id="tableUsuarios"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+<script>
+
+
+    function pageLoadCargaMatriz() {
+        consultarEventosEvaluacion()
+
+        $('#loading').hide()
+    }
+    window.onload = pageLoadCargaMatriz()
+
+    function consultarEventosEvaluacion() {
+        var result = getDataSp({
+            listaNombre: 'EventoEvaluacionColaborador',
+            filter: `Finalizo_Evaluacion eq 'NO'`,
+            colums: '*,EventoEvaluacion/Codigo,EventoEvaluacion/FechaInicio,EventoEvaluacion/FechaFin',
+            expand: 'EventoEvaluacion'
+        })
+        if (result.ok) {
+            procesarData(result.data.results)
+        }
+    }
+
+    function procesarData(data) {
+        var listaData = []
+
+        data.forEach(e => {
+            var item = {
+                codigo: e?.EventoEvaluacion?.Codigo || '',
+                fechaInicio: e?.EventoEvaluacion?.FechaInicio ? new Date(e?.EventoEvaluacion?.FechaInicio).format('MM/dd/yyyy') : "",
+                fechaFin: e?.EventoEvaluacion?.FechaFin ? new Date(e?.EventoEvaluacion?.FechaFin).format('MM/dd/yyyy') : "",
+                evaluado: e?.Evaluado_Nombre || '',
+                rol: e?.Rol || '',
+                editar: `
+                <a href="../SitePages/EvaluacionColaborador.aspx?IdSolicitud=${e.ID}&Admin=SI" class="btn btn-primary btn-sm text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-ui-checks" viewBox="0 0 16 16">
+                      <path d="M7 2.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5v-1zM2 1a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2zm0 8a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2H2zm.854-3.646a.5.5 0 0 1-.708 0l-1-1a.5.5 0 1 1 .708-.708l.646.647 1.646-1.647a.5.5 0 1 1 .708.708l-2 2zm0 8a.5.5 0 0 1-.708 0l-1-1a.5.5 0 0 1 .708-.708l.646.647 1.646-1.647a.5.5 0 0 1 .708.708l-2 2zM7 10.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5v-1zm0-5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0 8a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z"/>
+                    </svg>
+                </a>        
+                `
+            }
+            listaData.push(item)
+        })
+        lledarTabla(listaData)
+    }
+    //$('#lblFechaNegociacion').datepicker('setDate', fechaTime.format('MM-dd-yyyy'));
+
+    function lledarTabla(dataEventos) {
+        if ($.fn.dataTable.isDataTable('#tableUsuarios')) {
+            tablet = $('#tableUsuarios').DataTable();
+            tablet.destroy();
+        }
+        $('#tableUsuarios').empty();
+        $('#tableUsuarios').DataTable({
+            data: dataEventos,
+            columns: [
+                { data: 'codigo', title: 'Codigo' },
+                { data: 'fechaInicio', title: 'Fecha Inicio' },
+                { data: 'fechaFin', title: 'Fecha Fin' },
+                { data: 'evaluado', title: 'Evaluado' },
+                { data: 'rol', title: 'Rol' },
+
+                { data: 'editar', title: 'Evaluar' }
+            ],
+            columnDefs: [
+                { targets: 5, className: 'text-center' },
+            ],
+            language: {
+                "url": "../EstilosConfiguraciones/js/es-ES.json"
+            },
+            responsive: true
+        })
+
+
+
+    }
+
+
+
+</script>

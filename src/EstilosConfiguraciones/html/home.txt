@@ -1,0 +1,77 @@
+<link href="../EstilosConfiguraciones/CSS/style.css" rel="stylesheet">
+
+<link href="../EstilosConfiguraciones/CSS/bootstrap.min.css" rel="stylesheet">
+<script src="../EstilosConfiguraciones/JS/jquery-3.4.1.min.js"></script>
+<script src="../EstilosConfiguraciones/JS/bootstrap.min.js"></script>
+<script src="../EstilosConfiguraciones/JS/endpoint.js"></script>
+
+<link href="../EstilosConfiguraciones/CSS/datepicker.css" rel="stylesheet">
+<script src="../EstilosConfiguraciones/JS/bootstrap-datepicker.js"></script>
+
+<script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+
+<link rel="stylesheet" href="../EstilosConfiguraciones/css/dataTables.bootstrap4.min.css" />
+<script src="../EstilosConfiguraciones/js/jquery.dataTables4.min.js"></script>
+<script src="../EstilosConfiguraciones/js/dataTables.bootstrap4.min.js"></script>
+
+
+<link href="../EstilosConfiguraciones/css/jquery.toast.css" rel="stylesheet">
+<script src="../EstilosConfiguraciones/js/jquery.toast.js"></script>
+<style>
+    #loading {
+        background: #000000e0;
+        position: fixed;
+        text-align: center;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        right: 0;
+        left: 0;
+        z-index: 9999999;
+    }
+
+    .loader {
+        padding: 30px;
+        border: 10px solid #00aeff;
+        box-shadow: 0 0 5px 1px #00aeff;
+        border-right-color: #0b2739;
+        border-radius: 50%;
+        animation: rotate 1s infinite linear;
+        position: absolute;
+        top: 45%;
+        left: 45%;
+    }
+
+    @keyframes rotate {
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    .b-btn-primary-action,
+    .b-btn-primary-action:hover {
+        color: #fff;
+        background-color: #0b2739 !important;
+        border-color: #0b2739 !important;
+    }
+</style>
+
+<div id="loading">
+    <div class='loader'></div>
+</div>
+
+<section id="menu-section">
+
+</section>
+<script>
+    obtenerComponentes();
+    function obtenerComponentes() {
+        $("#menu-section").load("../EstilosConfiguraciones/html/menu.txt");
+    }
+    
+    function pageLoadCargaMatriz() {
+        
+        $('#loading').hide()
+    }
+    window.onload = pageLoadCargaMatriz()
+</script>

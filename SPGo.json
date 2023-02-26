@@ -1,0 +1,17 @@
+{
+    "sourceDirectory": "src",
+    "sharePointSiteUrl": "https://ayasacomec.sharepoint.com/sites/Evaluacin360",
+    "workspaceRoot": "d:\\Usuarios\\Xavi\\Documentos\\EVALUACIONES360",
+    "publishWorkspaceOptions": {
+        "destinationFolder": "/",
+        "globPattern": "d:\\Usuarios\\Xavi\\Documentos\\EVALUACIONES360\\src\\**\\*.*",
+        "localRoot": "d:\\Usuarios\\Xavi\\Documentos\\EVALUACIONES360\\src"
+    },
+    "publishingScope": "SaveOnly",
+    "authenticationType": "Forms",
+    "publishWorkspaceGlobPattern": "**/*.min.*",
+    "remoteFolders": [
+        "/EstilosConfiguraciones/**/*"
+    ]
+
+}

@@ -1,0 +1,533 @@
+<link href="../EstilosConfiguraciones/CSS/style.css" rel="stylesheet">
+
+<link href="../EstilosConfiguraciones/CSS/bootstrap.min.css" rel="stylesheet">
+<script src="../EstilosConfiguraciones/JS/jquery-3.4.1.min.js"></script>
+<script src="../EstilosConfiguraciones/JS/bootstrap.min.js"></script>
+<script src="../EstilosConfiguraciones/JS/endpoint.js"></script>
+
+
+<link href="../EstilosConfiguraciones/CSS/datepicker.css" rel="stylesheet">
+<script src="../EstilosConfiguraciones/JS/bootstrap-datepicker.js"></script>
+
+
+<script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+
+<link rel="stylesheet" href="../EstilosConfiguraciones/css/dataTables.bootstrap4.min.css" />
+<script src="../EstilosConfiguraciones/js/jquery.dataTables4.min.js"></script>
+<script src="../EstilosConfiguraciones/js/dataTables.bootstrap4.min.js"></script>
+
+<style>
+    #loading {
+        background: #000000e0;
+        position: fixed;
+        text-align: center;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        right: 0;
+        left: 0;
+        z-index: 9999999;
+    }
+
+    .loader {
+        padding: 30px;
+        border: 10px solid #00aeff;
+        box-shadow: 0 0 5px 1px #00aeff;
+        border-right-color: #0b2739;
+        border-radius: 50%;
+        animation: rotate 1s infinite linear;
+        position: absolute;
+        top: 45%;
+        left: 45%;
+    }
+
+    @keyframes rotate {
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    .b-btn-primary-action,
+    .b-btn-primary-action:hover {
+        color: #fff;
+        background-color: #0b2739 !important;
+        border-color: #0b2739 !important;
+    }
+</style>
+
+
+<style>
+    .card-header {
+        background-color: #222;
+    }
+
+    .btn-info {
+        color: #fff;
+        background-color: #5bc0de !important;
+        border-color: #46b8da !important;
+    }
+
+    .btn-success {
+        color: #fff;
+        background-color: #5cb85c !important;
+        border-color: #4cae4c !important;
+    }
+
+    .btn-default {
+        color: #333;
+        background-color: #fff !important;
+        border-color: #ccc !important;
+    }
+
+    .btn {
+        min-width: auto !important;
+    }
+
+    .hide-button .btn-eliminar {
+        display: none;
+    }
+
+    input[type=text][disabled] {
+        background-color: #e9ecef;
+    }
+
+    button[disabled][disabled] {
+        color: #fff;
+        cursor: not-allowed;
+    }
+
+    .theme-green .back-bar .selected-bar {
+        background-image: linear-gradient(to bottom, #5cb85c, #5cb85c);
+    }
+
+    .theme-green .back-bar .pointer-label {
+        color: #000;
+        font-size: 11px;
+        font-weight: 500;
+    }
+
+
+    .range-section {
+        padding-top: 1rem;
+        min-width: 400px;
+        max-width: 400px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+
+    }
+
+    .range-section .range-items {
+        display: flex;
+        width: 100%;
+    }
+
+    .range-section .range-items div {
+        width: 100px;
+        font-size: 10px;
+        text-align: center;
+    }
+
+    #accordionEvaluacion .card .card-header:hover {
+        background-color: #f1f1f1 !important;
+    }
+</style>
+
+
+
+
+
+
+<div id="loading">
+    <div class='loader'></div>
+</div>
+
+<section id="menu-section">
+
+</section>
+<script>
+    obtenerComponentes();
+    function obtenerComponentes() {
+        $("#menu-section").load("../EstilosConfiguraciones/html/menu.txt");
+    }
+</script>
+
+
+<section>
+    <div class="container mt-3">
+        <div class="card shadow">
+            <div class="card-header text-center">
+                <h5 class="text-white mb-0">Comentarios de Evaluaciones</h5>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="ddlMatrizEvaluadores" class="control-label font-weight-bold">Código Evento:</label>
+                    <select id="ddlMatrizEvaluadores" class="form-control form-control-sm border cls-controls"
+                        onchange="cambioEvento()">
+                        
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="ddlEvaluado" class="control-label font-weight-bold">Evaluado:</label>
+                    <select id="ddlEvaluado" class="form-control form-control-sm border cls-controls">
+                        
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="txtComentario" class="control-label font-weight-bold">Comentario:</label>
+                    <textarea id="txtComentario" class="form-control form-control-sm border cls-controls" cols="6"
+                        rows="5"></textarea>
+                </div>
+            </div>
+            <div class="card-footer text-center">
+                <button type="button" class="btn btn-success" onclick="guardarEnviar()">Guardar</button>
+                <a href="../SitePages/ListarComentario.aspx" class="btn btn-danger text-white">Cancelar</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    var _matrizEvaluadores = []
+    var _detalleUsuario = []
+    var _EventoEvaluacion = {}
+    
+    var idRegistro = '';
+    
+    function pageLoadCargaMatriz() {
+        var idSolicitud = obtenerParametroUrl('IdSolicitud')
+        if(idSolicitud){
+            idRegistro = idSolicitud
+            consultarSolicitud(idSolicitud)
+        }else{
+            consultarMatrizEvaluadores()
+        }
+        $('#loading').hide()
+    }
+    window.onload = pageLoadCargaMatriz()
+
+    function consultarMatrizEvaluadores() {
+        $('#ddlMatrizEvaluadores').empty()
+        $('#ddlMatrizEvaluadores').append(`<option value="">---Seleccione---</option>`)
+        var result = getDataSp({ listaNombre: 'DetalleEvaluadores', colums: '*,Codigo_Matriz/Title,Codigo_Matriz/ID,Codigo_Matriz/Codigo', expand: 'Codigo_Matriz', filter: `Finalizo_Registro eq 'SI'` })
+        if (result.ok) {
+            _matrizEvaluadores = result.data.results
+            _matrizEvaluadores.forEach(e => {
+                $('#ddlMatrizEvaluadores').append(`<option value="${e.Codigo_Matriz.ID}">${e?.Codigo_Matriz?.Codigo} - ${e?.Codigo_Matriz?.Title}</option>`)
+            })
+        }
+    }
+
+
+    function cambioEvento() {
+        var data = []
+        _EventoEvaluacion = {}
+        if ($('#ddlMatrizEvaluadores').val() != '') {
+            var detalleSeleccionado = _matrizEvaluadores.find(e => e.Codigo_Matriz.ID == $('#ddlMatrizEvaluadores').val())
+            data = JSON.parse(detalleSeleccionado.Detalle_Json || '[]')
+
+            var result = getDataSp({ listaNombre: 'EventosEvaluacion', colums: '*,CodigoMatriz/ID', expand: 'CodigoMatriz', filter: `CodigoMatriz/ID eq '${detalleSeleccionado.ID}'` })
+            if (result.ok) {
+                if (result.data.results.length > 0) {
+
+                    _EventoEvaluacion = result.data.results[0]
+                }
+            }
+        }
+
+        _detalleUsuario = data
+        llenarComboEvaluado()
+    }
+
+    function llenarComboEvaluado() {
+        $('#ddlEvaluado').empty()
+        $('#ddlEvaluado').append(`<option value="">---Seleccione---</option>`)
+        _detalleUsuario.forEach(e => {
+            $('#ddlEvaluado').append(`<option value="${e.emailUsuario}">${e.nombreUsuario}</option>`)
+        })
+    }
+    
+    
+    
+            
+    function consultarSolicitud(id){
+        var result = getDataSp({ listaNombre: 'ComentariosEvaluaciones', 
+        colums: '*,Matriz/Codigo,Matriz/Title', 
+        expand: 'Matriz',
+        idSolicitud:id
+        })
+        
+        $('#ddlMatrizEvaluadores').attr('disabled',true)
+        $('#ddlEvaluado').attr('disabled',true)
+        
+        
+        var matriz = result?.data?.Matriz?.Codigo +' - '+ result?.data?.Matriz?.Title
+        $('#ddlMatrizEvaluadores').append(`<option value="">${matriz}</option>`)
+        $('#ddlMatrizEvaluadores').addClass(`text-dark`)
+        
+        
+        var user = result?.data?.NombreColaborador
+        $('#ddlEvaluado').append(`<option value="">${user}</option>`)
+        $('#ddlEvaluado').addClass(`text-dark`)
+        
+        $('#txtComentario').val(result?.data?.Comentario)
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    function obtenerParametroUrl(parametro) {
+        let params = new URLSearchParams(location.search);
+        return params.get(parametro);
+    }
+    
+</script>
+
+<script>
+
+    function guardarEnviar(){
+        if(idRegistro == ''){
+            validarCamposGuardar()
+        }else{
+            validarCamposActualizar() 
+        }
+    }
+
+    function validarCamposGuardar() {
+        var matriz = $('#ddlMatrizEvaluadores').val()
+        var evaluado = $('#ddlEvaluado').val()
+        var Comentario = $('#txtComentario').val()
+
+        if (matriz == '') {
+            mostrarAlert({ message: 'Debe seleccionar un código evento', typeAlert: 'error' })
+            return
+        }
+        if (evaluado == '') {
+            mostrarAlert({ message: 'Debe seleccionar un evaluado', typeAlert: 'error' })
+            return
+        }
+        if (Comentario == '') {
+            mostrarAlert({ message: 'Debe ingresar un comentario', typeAlert: 'error' })
+            return
+        }
+
+        var usuario = _detalleUsuario.find(e => e.emailUsuario == evaluado)
+
+
+        var solicitud = {
+            Title: usuario.emailUsuario,
+            NombreColaborador: usuario.nombreUsuario,
+            CedulaColaborador: usuario.cedulaUsuario,
+            Rol: usuario.rol,
+            Comentario: Comentario,
+            MatrizId: matriz,
+            EventosEvaluacionId: _EventoEvaluacion.ID
+        }
+
+        $('#loading').show()
+        setTimeout(() => {
+            crearRegistro(solicitud)
+        }, 300);
+
+    }
+    
+    
+
+
+    function crearRegistro(registro) {
+        var result = createItemSp({ solicitudCreate: registro, listaNombre: 'ComentariosEvaluaciones' })
+        if (result.ok) {
+            $('.form-control,.btn-success').attr('disabled',true)
+            $('.form-control').val('')
+            $('#loading').hide()
+            mostrarAlert({ message: 'El comentario se ha registrado exitosamente' })
+
+            setTimeout(() => {
+                window.location.href = "../SitePages/ListarComentario.aspx";
+            }, 2000);
+        }
+    }
+    
+    function validarCamposActualizar() {
+        var Comentario = $('#txtComentario').val()
+        if (Comentario == '') {
+            mostrarAlert({ message: 'Debe ingresar un comentario', typeAlert: 'error' })
+            return
+        }
+        var solicitud = {
+            Comentario: Comentario,
+        }
+
+        $('#loading').show()
+        setTimeout(() => {
+            actualizarRegistro(solicitud)
+        }, 300);
+    }
+    
+    
+    function actualizarRegistro(registro) {
+        var result = updateItemSp({ solicitudUpdate: registro, listaNombre: 'ComentariosEvaluaciones',idSolicitud:idRegistro })
+        if (result.ok) {
+            $('.form-control,.btn-success').attr('disabled',true)
+            $('.form-control').val('')
+            $('#loading').hide()
+            mostrarAlert({ message: 'El comentario se ha actualizado exitosamente' })
+
+            setTimeout(() => {
+                window.location.href = "../SitePages/ListarComentario.aspx";
+            }, 2000);
+        }
+    }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>
+    .alert-float-right {
+        position: fixed;
+        left: 0px;
+        right: 0px;
+        top: 85px;
+        margin: auto;
+        width: max-content;
+        display: none;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 500px;
+    }
+</style>
+
+<div class="alert alert-danger alert-float-right  alert-error " role="alert">
+    <div class="d-flex aling-item-center">
+        <strong class="d-flex aling-item-center align-self-center mr-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                class="bi bi-x-circle-fill" viewBox="0 0 16 16">
+                <path
+                    d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z" />
+            </svg>
+        </strong>
+        <span class="message-alert" id="message-error">
+
+        </span>
+    </div>
+
+    <strong class="pl-4 d-flex aling-item-center cursor-pointer" onclick="ocultarAlert()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-x"
+            viewBox="0 0 16 16">
+            <path
+                d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
+        </svg>
+    </strong>
+</div>
+
+
+<div class="alert alert-success alert-float-right  alert-success" role="alert">
+    <div class="d-flex aling-item-center">
+        <strong class="d-flex aling-item-center align-self-center mr-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                class="bi bi-check-circle-fill" viewBox="0 0 16 16">
+                <path
+                    d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
+            </svg>
+        </strong>
+        <span class="message-alert" id="message-success">
+
+        </span>
+    </div>
+
+    <strong class="pl-4 d-flex aling-item-center cursor-pointer" onclick="ocultarAlert()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-x"
+            viewBox="0 0 16 16">
+            <path
+                d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
+        </svg>
+    </strong>
+</div>
+
+
+<script>
+    var timeout;
+    function mostrarAlert({ typeAlert = 'success', time = 5000, message = '' }) {
+        clearTimeout(timeout)
+        $('.alert').hide()
+        $('.message-alert').text('')
+
+        switch (typeAlert) {
+            case 'success':
+                $('#message-success').text(message)
+                $('.alert-success').fadeIn(500)
+                break
+            case 'error':
+                $('#message-error').text(message)
+                $('.alert-error').fadeIn(500)
+                break
+            default:
+                $('#message-success').text(message)
+                $('.alert-success').fadeIn(500)
+                break
+        }
+        timeout = setTimeout(() => {
+            clearTimeout(timeout)
+            $('.alert').fadeOut("slow")
+        }, time)
+    }
+
+    function ocultarAlert() {
+        clearTimeout(timeout)
+        $('.alert').hide()
+    }
+    ocultarAlert()
+</script>

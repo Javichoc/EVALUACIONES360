@@ -1,0 +1,273 @@
+<link href="../EstilosConfiguraciones/CSS/style.css" rel="stylesheet">
+
+<link href="../EstilosConfiguraciones/CSS/bootstrap.min.css" rel="stylesheet">
+<script src="../EstilosConfiguraciones/JS/jquery-3.4.1.min.js"></script>
+<script src="../EstilosConfiguraciones/JS/bootstrap.min.js"></script>
+<script src="../EstilosConfiguraciones/JS/endpoint.js"></script>
+
+
+<link href="../EstilosConfiguraciones/CSS/datepicker.css" rel="stylesheet">
+<script src="../EstilosConfiguraciones/JS/bootstrap-datepicker.js"></script>
+
+
+<script src="
+https://cdn.jsdelivr.net/npm/vanilla-rangeslider@1.0.0/js/rangeslider.min.js
+"></script>
+<link href="
+https://cdn.jsdelivr.net/npm/vanilla-rangeslider@1.0.0/css/rangeslider.min.css
+" rel="stylesheet">
+
+<style>
+    #loading {
+        background: #000000e0;
+        position: fixed;
+        text-align: center;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        right: 0;
+        left: 0;
+        z-index: 9999999;
+    }
+
+    .loader {
+        padding: 30px;
+        border: 10px solid #00aeff;
+        box-shadow: 0 0 5px 1px #00aeff;
+        border-right-color: #0b2739;
+        border-radius: 50%;
+        animation: rotate 1s infinite linear;
+        position: absolute;
+        top: 45%;
+        left: 45%;
+    }
+
+    @keyframes rotate {
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    .b-btn-primary-action,
+    .b-btn-primary-action:hover {
+        color: #fff;
+        background-color: #0b2739 !important;
+        border-color: #0b2739 !important;
+    }
+</style>
+
+
+<style>
+    .card-header {
+        background-color: #222;
+    }
+
+    .btn-info {
+        color: #fff;
+        background-color: #5bc0de !important;
+        border-color: #46b8da !important;
+    }
+
+    .btn-success {
+        color: #fff;
+        background-color: #5cb85c !important;
+        border-color: #4cae4c !important;
+    }
+
+    .btn-default {
+        color: #333;
+        background-color: #fff !important;
+        border-color: #ccc !important;
+    }
+</style>
+
+
+
+
+
+<div id="loading">
+    <div class='loader'></div>
+</div>
+
+<section id="menu-section">
+
+</section>
+<script>
+    obtenerComponentes();
+    function obtenerComponentes() {
+        $("#menu-section").load("../EstilosConfiguraciones/html/menu.txt");
+    }
+</script>
+
+
+<section>
+    <div class="container mt-3">
+        <div class="card shadow">
+            <div class="card-header text-center">
+                <h5 class="text-white mb-0">Nuevo Evento Evaluación</h5>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="txtTitulo" class="control-label font-weight-bold">Título:</label>
+                    <input id="txtTitulo" class="form-control border" type="text">
+                </div>
+                <div class="form-group">
+                    <label for="txtCodigo" class="control-label font-weight-bold">Código:</label>
+                    <input id="txtCodigo" class="form-control border" type="text">
+                </div>
+                <div class="form-group">
+                    <label for="txtInformacionAdicional" class="control-label font-weight-bold">información
+                        Adicional:</label>
+                    <textarea id="txtInformacionAdicional" class="form-control border" cols="4" rows="3"></textarea>
+                </div>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="txtFechaInicio" class="control-label font-weight-bold">Fecha Inicio:</label>
+                            <div class="input-group">
+                                <input id="txtFechaInicio" class="form-control border text-center bg-white" readonly
+                                    type="text">
+                                <div class="input-group-append">
+                                    <label class="input-group-text" for="inputGroupSelect02">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                            fill="currentColor" class="bi bi-calendar" viewBox="0 0 16 16">
+                                            <path
+                                                d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z" />
+                                        </svg>
+                                    </label>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="txtFechaFin" class="control-label font-weight-bold">Fecha Fin:</label>
+                            <div class="input-group">
+                                <input id="txtFechaFin" class="form-control border text-center bg-white" readonly
+                                    type="text">
+                                <div class="input-group-append">
+                                    <label class="input-group-text" for="inputGroupSelect02">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                            fill="currentColor" class="bi bi-calendar" viewBox="0 0 16 16">
+                                            <path
+                                                d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z" />
+                                        </svg>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="txtInformacionAdicional" class="control-label font-weight-bold">información
+                        Adicional:</label>
+                    <textarea id="txtInformacionAdicional" class="form-control border" cols="4" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="card-footer d-flex justify-content-between">
+                <button type="button" class="btn btn-info">Guardar</button>
+                <button type="button" class="btn btn-success">Guardar y Generar</button>
+                <button type="button" class="btn btn-default">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    $(function () {
+        $('#txtFechaInicio,#txtFechaFin').datepicker({
+            autoclose: true,
+            format: 'yyyy-mm-dd'
+        })
+    });
+
+    function pageLoad() {
+
+        $('#loading').hide()
+    }
+    //window.onload = pageLoad()
+
+
+
+</script>
+
+
+<style>
+.collapsible-link::before {
+  content: '';
+  width: 14px;
+  height: 2px;
+  background: #333;
+  position: absolute;
+  top: calc(50% - 1px);
+  right: 1rem;
+  display: block;
+  transition: all 0.3s;
+}
+
+/* Vertical line */
+.collapsible-link::after {
+  content: '';
+  width: 2px;
+  height: 14px;
+  background: #333;
+  position: absolute;
+  top: calc(50% - 7px);
+  right: calc(1rem + 6px);
+  display: block;
+  transition: all 0.3s;
+}
+
+.collapsible-link[aria-expanded='true']::after {
+  transform: rotate(90deg) translateX(-1px);
+}
+
+.collapsible-link[aria-expanded='true']::before {
+  transform: rotate(180deg);
+}
+</style>
+<div class="row">
+    <div class="col-lg-9 mx-auto">
+      <!-- Accordion -->
+      <div id="accordionExample" class="accordion shadow">
+
+        <!-- Accordion item 1 -->
+        <div class="card">
+          <div id="headingOne" class="card-header bg-white shadow-sm border-0">
+            <h6 class="mb-0 font-weight-bold"><a href="#" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne" class="d-block position-relative text-dark text-uppercase collapsible-link py-2">Collapsible Group Item #1</a></h6>
+          </div>
+          <div id="collapseOne" aria-labelledby="headingOne" data-parent="#accordionExample" class="collapse show">
+            <div class="card-body p-5">
+              <p class="font-weight-light m-0">Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Accordion item 2 -->
+        <div class="card">
+          <div id="headingTwo" class="card-header bg-white shadow-sm border-0">
+            <h6 class="mb-0 font-weight-bold"><a href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo" class="d-block position-relative collapsed text-dark text-uppercase collapsible-link py-2">Collapsible Group Item #2</a></h6>
+          </div>
+          <div id="collapseTwo" aria-labelledby="headingTwo" data-parent="#accordionExample" class="collapse">
+            <div class="card-body p-5">
+              <p class="font-weight-light m-0">Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Accordion item 3 -->
+        <div class="card">
+          <div id="headingThree" class="card-header bg-white shadow-sm border-0">
+            <h6 class="mb-0 font-weight-bold"><a href="#" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree" class="d-block position-relative collapsed text-dark text-uppercase collapsible-link py-2">Collapsible Group Item #3</a></h6>
+          </div>
+          <div id="collapseThree" aria-labelledby="headingThree" data-parent="#accordionExample" class="collapse">
+            <div class="card-body p-5">
+              <p class="font-weight-light m-0">Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>

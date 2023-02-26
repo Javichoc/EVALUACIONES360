@@ -1,0 +1,614 @@
+<link href="../EstilosConfiguraciones/CSS/style.css" rel="stylesheet">
+
+<link href="../EstilosConfiguraciones/CSS/bootstrap.min.css" rel="stylesheet">
+<script src="../EstilosConfiguraciones/JS/jquery-3.4.1.min.js"></script>
+<script src="../EstilosConfiguraciones/JS/bootstrap.min.js"></script>
+<script src="../EstilosConfiguraciones/JS/endpoint.js"></script>
+
+
+<link href="../EstilosConfiguraciones/CSS/datepicker.css" rel="stylesheet">
+<script src="../EstilosConfiguraciones/JS/bootstrap-datepicker.js"></script>
+
+
+<script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+
+<link rel="stylesheet" href="../EstilosConfiguraciones/css/dataTables.bootstrap4.min.css" />
+<script src="../EstilosConfiguraciones/js/jquery.dataTables4.min.js"></script>
+<script src="../EstilosConfiguraciones/js/dataTables.bootstrap4.min.js"></script>
+
+
+<link href="../EstilosConfiguraciones/css/jquery.toast.css" rel="stylesheet">
+<script src="../EstilosConfiguraciones/js/jquery.toast.js"></script>
+<style>
+    #loading {
+        background: #000000e0;
+        position: fixed;
+        text-align: center;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        right: 0;
+        left: 0;
+        z-index: 9999999;
+    }
+
+    .loader {
+        padding: 30px;
+        border: 10px solid #00aeff;
+        box-shadow: 0 0 5px 1px #00aeff;
+        border-right-color: #0b2739;
+        border-radius: 50%;
+        animation: rotate 1s infinite linear;
+        position: absolute;
+        top: 45%;
+        left: 45%;
+    }
+
+    @keyframes rotate {
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    .b-btn-primary-action,
+    .b-btn-primary-action:hover {
+        color: #fff;
+        background-color: #0b2739 !important;
+        border-color: #0b2739 !important;
+    }
+</style>
+
+
+<style>
+    .card-header {
+        background-color: #222;
+    }
+
+    .btn-info {
+        color: #fff;
+        background-color: #5bc0de !important;
+        border-color: #46b8da !important;
+    }
+
+    .btn-success {
+        color: #fff;
+        background-color: #5cb85c !important;
+        border-color: #4cae4c !important;
+    }
+
+    .btn-default {
+        color: #333;
+        background-color: #fff !important;
+        border-color: #ccc !important;
+    }
+
+    .btn {
+        min-width: auto !important;
+    }
+
+    .hide-button .btn-eliminar {
+        display: none;
+    }
+
+    input[type=text][disabled] {
+        background-color: #e9ecef;
+    }
+    button[disabled][disabled]{
+        color: #fff;
+        cursor: not-allowed;
+    }
+</style>
+
+
+
+
+
+<div id="loading">
+    <div class='loader'></div>
+</div>
+
+<section id="menu-section">
+
+</section>
+<script>
+    obtenerComponentes();
+    function obtenerComponentes() {
+        $("#menu-section").load("../EstilosConfiguraciones/html/menu.txt");
+    }
+</script>
+
+
+<section>
+    <div class="container mt-3">
+        <div class="card shadow">
+            <div class="card-header text-center">
+                <h5 class="text-white mb-0">Evento Evaluación</h5>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="txtTitulo" class="control-label font-weight-bold">Título:</label>
+                    <input id="txtTitulo" class="form-control form-control-sm border cls-controls" type="text">
+                </div>
+                <div class="form-group">
+                    <label for="txtCodigo" class="control-label font-weight-bold">Código:</label>
+                    <input id="txtCodigo" class="form-control form-control-sm border cls-controls" type="text">
+                </div>
+                <div class="form-group">
+                    <label for="txtInformacionAdicional" class="control-label font-weight-bold">Información
+                        Adicional:</label>
+                    <textarea id="txtInformacionAdicional" class="form-control form-control-sm border cls-controls"
+                        cols="6" rows="5"></textarea>
+                </div>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="txtFechaInicio" class="control-label font-weight-bold">Fecha Inicio:</label>
+                            <div class="input-group">
+                                <input id="txtFechaInicio"
+                                    class="form-control form-control-sm border text-center bg-white" readonly
+                                    type="text" placeholder="mm/dd/yyyy">
+                                <div class="input-group-append">
+                                    <label class="input-group-text" for="inputGroupSelect02">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                            fill="currentColor" class="bi bi-calendar" viewBox="0 0 16 16">
+                                            <path
+                                                d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z" />
+                                        </svg>
+                                    </label>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="txtFechaFin" class="control-label font-weight-bold">Fecha Fin:</label>
+                            <div class="input-group">
+                                <input id="txtFechaFin" class="form-control form-control-sm border text-center bg-white"
+                                    readonly type="text" placeholder="mm/dd/yyyy">
+                                <div class="input-group-append">
+                                    <label class="input-group-text" for="inputGroupSelect02">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                            fill="currentColor" class="bi bi-calendar" viewBox="0 0 16 16">
+                                            <path
+                                                d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z" />
+                                        </svg>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label for="txtFechaPublicacion" class="control-label font-weight-bold cls-controls">Fecha
+                                Publicación:</label>
+                            <div class="input-group">
+                                <input id="txtFechaPublicacion"
+                                    class="form-control form-control-sm border text-center bg-white" readonly
+                                    type="text" placeholder="mm/dd/yyyy">
+                                <div class="input-group-append">
+                                    <label class="input-group-text" for="">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                            fill="currentColor" class="bi bi-calendar" viewBox="0 0 16 16">
+                                            <path
+                                                d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z" />
+                                        </svg>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="ddlMatrizEvaluadores" class="control-label font-weight-bold" >Matriz Evaluadores:</label>
+                    <select id="ddlMatrizEvaluadores" class="form-control form-control-sm border cls-controls" onchange="cambioMatriz()">
+                        <option value="">---Seleeccione---</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="ddlCompetenciaPregunta" class="control-label font-weight-bold">Competencia
+                        Pregunta:</label>
+                    <select id="ddlCompetenciaPregunta" class="form-control form-control-sm border cls-controls">
+                        <option value="">---Seleeccione---</option>
+                    </select>
+                </div>
+            </div>
+            <div class="card-footer text-center">
+                <button type="button" class="btn btn-info" onclick="validarCamposGuardar()">Guardar</button>
+                <button type="button" class="btn btn-success" onclick="validarCamposEnviar()"
+                    id="btn-guardarGen">Guardar y Generar</button>
+                <a href="../SitePages/ListarEventosEvaluacion.aspx" class="btn btn-danger text-white">Cancelar</a>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid mt-5 bg-white shadow" id="div-table" style="display: none;">
+        <div class="row py-2">
+            <div class="col-md-12 ">
+                <table class="table table-sm table-striped table-bordered w-100" id="tableUsuarios"></table>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    var _usuriosBD = []
+    var _matrizEvaluadores = []
+    var _competenciaPregunta = []
+    var _idRegistroExistente = ''
+
+    $(function () {
+        $('#txtFechaInicio,#txtFechaFin,#txtFechaPublicacion').datepicker({
+            autoclose: true,
+            format: 'mm/dd/yyyy'
+        })
+    });
+
+    function pageLoadCargaMatriz() {
+        leerdataUsuarios()
+        consultarMatrizEvaluadores()
+        consultarCompetenciaPregunta()
+
+        var idSolicitud = obtenerParametroUrl('IdSolicitud')
+        if (idSolicitud) {
+            consultarInformacionSolicitud(idSolicitud)
+        }
+        $('#loading').hide()
+    }
+    window.onload = pageLoadCargaMatriz()
+
+    function consultarMatrizEvaluadores() {
+        var result = getDataSp({ listaNombre: 'DetalleEvaluadores', colums: '*,Codigo_Matriz/Title,Codigo_Matriz/ID,Codigo_Matriz/Codigo', expand: 'Codigo_Matriz', filter: `Finalizo_Registro eq 'SI'` })
+        if (result.ok) {
+            _matrizEvaluadores = result.data.results
+            _matrizEvaluadores.forEach(e => {
+                $('#ddlMatrizEvaluadores').append(`<option value="${e.Id}">${e?.Codigo_Matriz?.Codigo} - ${e?.Codigo_Matriz?.Title}</option>`)
+            })
+        }
+    }
+
+    function consultarCompetenciaPregunta() {
+        var result = getDataSp({ listaNombre: 'Competencia', filter: `Estado eq 'Activo'` })
+        if (result.ok) {
+            _competenciaPregunta = result.data.results
+            _competenciaPregunta.forEach(e => {
+                $('#ddlCompetenciaPregunta').append(`<option value="${e.Id}">${e?.Codigo} - ${e?.Title}</option>`)
+            })
+        }
+    }
+
+
+    function consultarInformacionSolicitud(idSolicitud) {
+        var result = getDataSp({
+            listaNombre: 'EventosEvaluacion',
+            idSolicitud: idSolicitud
+        })
+        if (result.ok) {
+            var item = result.data
+
+            _idRegistroExistente = item.ID
+
+            $('#txtTitulo').val(item.Title || '')
+            $('#txtCodigo').val(item.Codigo || '')
+            $('#txtInformacionAdicional').val(item.Informacion || '')
+
+            if (item.FechaInicio) {
+                $('#txtFechaInicio').datepicker('setDate', new Date(item.FechaInicio).format('MM/dd/yyyy'));
+            }
+            if (item.FechaFin) {
+                $('#txtFechaFin').datepicker('setDate', new Date(item.FechaFin).format('MM/dd/yyyy'));
+            }
+            if (item.FechaPublicacion) {
+                $('#txtFechaPublicacion').datepicker('setDate', new Date(item.FechaPublicacion).format('MM/dd/yyyy'));
+            }
+            $('#ddlMatrizEvaluadores').val(item.CodigoMatrizId || '')
+            $('#ddlCompetenciaPregunta').val(item.CodigoCompetenciaId || '')
+
+            if (item.Finalizo_Registro == 'SI') {
+                $('.cls-controls').attr('disabled', true)
+                $('.cls-controls').addClass('disabled text-dark')
+                $('.cls-controls, #btn-guardarGen').attr('disabled', true)
+            }
+            cambioMatriz()
+        }
+    }
+
+    function validarCamposGuardar() {
+        var titulo = $('#txtTitulo').val()
+        var codigo = $('#txtCodigo').val()
+        var informacionAdicional = $('#txtInformacionAdicional').val()
+        var fechaInicio = $('#txtFechaInicio').val()
+        var fechaFin = $('#txtFechaFin').val()
+        var fechaPublicacion = $('#txtFechaPublicacion').val()
+        var matrizEvaluadores = $('#ddlMatrizEvaluadores').val()
+        var competenciaPregunta = $('#ddlCompetenciaPregunta').val()
+
+        var solicitud = {}
+        if (titulo.trim() == '') {
+            mostrarMensajeError('Debe ingresar un título')
+            return
+        }
+        solicitud.Title = titulo
+        solicitud.Codigo = codigo
+        solicitud.Informacion = informacionAdicional
+        solicitud.FechaInicio = fechaInicio == '' ? null : new Date(fechaInicio)
+        solicitud.FechaFin = fechaFin == '' ? null : new Date(fechaFin)
+        solicitud.FechaPublicacion = fechaPublicacion == '' ? null : new Date(fechaPublicacion)
+        solicitud.CodigoMatrizId = matrizEvaluadores == '' ? null : matrizEvaluadores
+        solicitud.CodigoCompetenciaId = competenciaPregunta == '' ? null : competenciaPregunta
+
+        $('#loading').show()
+        setTimeout(() => {
+            creaActualizaRegistro(solicitud, 'ACTUALIZAR')
+        }, 300);
+    }
+
+
+    function validarCamposEnviar() {
+        var titulo = $('#txtTitulo').val()
+        var codigo = $('#txtCodigo').val()
+        var informacionAdicional = $('#txtInformacionAdicional').val()
+        var fechaInicio = $('#txtFechaInicio').val()
+        var fechaFin = $('#txtFechaFin').val()
+        var fechaPublicacion = $('#txtFechaPublicacion').val()
+        var matrizEvaluadores = $('#ddlMatrizEvaluadores').val()
+        var competenciaPregunta = $('#ddlCompetenciaPregunta').val()
+
+        var solicitud = {}
+        if (titulo.trim() == '') {
+            mostrarMensajeError('Debe ingresar un título')
+            return
+        }
+
+        if (codigo.trim() == '') {
+            mostrarMensajeError('Debe ingresar un código')
+            return
+        }
+
+        if (informacionAdicional.trim() == '') {
+            mostrarMensajeError('Debe ingresar la información adicional')
+            return
+        }
+
+        if (fechaInicio.trim() == '') {
+            mostrarMensajeError('Debe seleccionar la fecha inicio')
+            return
+        }
+
+        if (fechaFin.trim() == '') {
+            mostrarMensajeError('Debe seleccionar la fecha fin')
+            return
+        }
+        var startDate = new Date(fechaInicio)
+        var endDate = new Date(fechaFin)
+
+
+        if (startDate > endDate) {
+            mostrarMensajeError('La fecha fin no puede ser menor a la fecha inicio')
+            return
+        }
+
+        if (fechaPublicacion.trim() == '') {
+            mostrarMensajeError('Debe seleccionar la fecha de publicación')
+            return
+        }
+
+        if (matrizEvaluadores.trim() == '') {
+            mostrarMensajeError('Debe seleccionar una matriz evaluadores')
+            return
+        }
+
+        if (competenciaPregunta.trim() == '') {
+            mostrarMensajeError('Debe seleccionar una competencia pregunta')
+            return
+        }
+
+
+        solicitud.Title = titulo
+        solicitud.Codigo = codigo
+        solicitud.Informacion = informacionAdicional
+        solicitud.FechaInicio = fechaInicio == '' ? null : new Date(fechaInicio)
+        solicitud.FechaFin = fechaFin == '' ? null : new Date(fechaFin)
+        solicitud.FechaPublicacion = fechaPublicacion == '' ? null : new Date(fechaPublicacion)
+        solicitud.CodigoMatrizId = matrizEvaluadores == '' ? null : matrizEvaluadores
+        solicitud.CodigoCompetenciaId = competenciaPregunta == '' ? null : competenciaPregunta
+        solicitud.Finalizo_Registro = 'SI'
+        $('#loading').show()
+        setTimeout(() => {
+            creaActualizaRegistro(solicitud, 'GENERAR')
+        }, 300);
+    }
+
+
+    function creaActualizaRegistro(registro, tipo) {
+        var mensaje = ''
+        if (_idRegistroExistente != '') {
+            var result = actualizarRegistro(registro)
+            if (result.ok) {
+                if (tipo == 'ACTUALIZAR') {
+                    mensaje = 'El registro se actualizo correctamente'
+                    mostrarMensajeCorrecto(mensaje)
+                    $('#loading').hide()
+                } else {
+                    createListItems()
+                }
+
+            } else {
+                mostrarMensajeError(result.message, 10000)
+                $('#loading').hide()
+            }
+        } else {
+            var result = crearRegistro(registro)
+            if (result.ok) {
+                if (tipo == 'ACTUALIZAR') {
+                    mensaje = 'El registro se creo y actualizo correctamente'
+                    mostrarMensajeCorrecto(mensaje)
+                    $('#loading').hide()
+                } else {
+                    createListItems()
+                }
+
+            } else {
+                mostrarMensajeError(result.message, 10000)
+                $('#loading').hide()
+            }
+        }
+    }
+
+
+
+    function createListItems() {
+        var matriz = _matrizEvaluadores.find(e => e.ID == $('#ddlMatrizEvaluadores').val())
+        var data = JSON.parse(matriz.Detalle_Json || '[]')
+
+
+        var clientContext = SP.ClientContext.get_current()
+        var oList = clientContext.get_web().get_lists().getByTitle('EventoEvaluacionColaborador')
+        data.forEach(e => {
+            var itemCreateInfo = new SP.ListItemCreationInformation()
+            var oListItem = oList.addItem(itemCreateInfo)
+            oListItem.set_item('Evaluado_Nombre', e.nombreUsuario)
+            oListItem.set_item('Evaluado_Email', e.emailUsuario)
+            oListItem.set_item('Evaluado_Cedula', e.cedulaUsuario)
+            oListItem.set_item('Rol', e.rol)
+            oListItem.set_item('Evaluador_Nombre', e.nombreEvaluador)
+            oListItem.set_item('Evaluador_Email', e.emailEvaluador)
+            oListItem.set_item('Evaluador_Cedula', e.cedulaEvaluador)
+            oListItem.set_item('Title', $('#txtTitulo').val())
+            oListItem.set_item('Codigo', $('#txtCodigo').val())
+            oListItem.set_item('Informacion_Adicional', $('#txtInformacionAdicional').val())
+            oListItem.set_item('Matriz_Evaluaddores', $('#ddlMatrizEvaluadores').val())
+            oListItem.set_item('Competencia', $('#ddlCompetenciaPregunta').val())
+            oListItem.set_item('EventoEvaluacion', _idRegistroExistente)
+            oListItem.update()
+        });
+        clientContext.executeQueryAsync(onQuerySucceeded, onQueryFailed);
+    }
+
+    function onQuerySucceeded() {
+        $('.cls-controls').attr('disabled', true)
+        $('.cls-controls').addClass('disabled text-dark')
+        $('.cls-controls, #btn-guardarGen').attr('disabled', true)
+
+
+        $('#loading').hide()
+        mostrarMensajeCorrecto('Se ha generado el evento evaluación correctamente')
+        
+        setTimeout(() => {
+            window.location.href = "../SitePages/ListarEventosEvaluacion.aspx";
+        }, 2000);
+
+    }
+
+    function onQueryFailed(sender, args) {
+        mostrarMensajeError('Request failed. ' + args.get_message() + '\n' + args.get_stackTrace(), 10000);
+    }
+
+
+
+    function leerdataUsuarios() {
+        $.get(`${_spPageContextInfo.webAbsoluteUrl}/BDColaboradores/BDColaborador.txt`, function (data) {
+            var resourceContent = data;
+            var dataArray = data.split(';').filter(e => e != '')
+            dataArray.forEach(e => {
+                var [cedulaUsuario, nombreUsuario, emailUsuario, cedulaEvaluador, nombreEvaluador, emailEvaluador, rol] = e.split(',')
+                _usuriosBD.push({ cedulaUsuario, nombreUsuario, emailUsuario, cedulaEvaluador, nombreEvaluador, emailEvaluador, rol })
+            });
+        });
+    }
+
+    function actualizarRegistro(registro) {
+        var result = updateItemSp({ solicitudUpdate: registro, listaNombre: 'EventosEvaluacion', idSolicitud: _idRegistroExistente })
+        return result
+    }
+
+    function crearRegistro(registro) {
+        var result = createItemSp({ solicitudCreate: registro, listaNombre: 'EventosEvaluacion' })
+        if (result.ok) {
+            _idRegistroExistente = result.data.d.Id
+            exitoso = true
+        }
+        return result
+    }
+
+
+    function obtenerParametroUrl(parametro) {
+        let params = new URLSearchParams(location.search);
+        return params.get(parametro);
+    }
+    
+    
+    
+    function cambioMatriz() {
+        var data = []
+        if ($('#ddlMatrizEvaluadores').val() != '') {
+            var detalleSeleccionado = _matrizEvaluadores.find(e => e.ID == $('#ddlMatrizEvaluadores').val())
+            data = JSON.parse(detalleSeleccionado.Detalle_Json || '[]')
+        }
+        lledarTabla(data)
+
+    }
+    function lledarTabla(data) {
+        if ($.fn.dataTable.isDataTable('#tableUsuarios')) {
+            tablet = $('#tableUsuarios').DataTable();
+            tablet.destroy();
+        }
+        $('#tableUsuarios').empty();
+        $('#tableUsuarios').DataTable({
+            data: data,
+            columns: [
+                
+                { data: 'nombreUsuario', title: 'Nombre evaluado' },
+                { data: 'emailUsuario', title: 'Email evaluado' },
+                { data: 'rol', title: 'Rol' },
+                { data: 'nombreEvaluador', title: 'Nombre evaluador' },
+                { data: 'emailEvaluador', title: 'Email evaluador' },
+                { data: 'informacionAdicional', title: 'Información adicional' },
+            ],
+            language: {
+                "url": "../EstilosConfiguraciones/js/es-ES.json"
+            },
+            responsive: true
+        })
+
+
+        if (data.length > 0) {
+            $('#div-table').show()
+        } else {
+            $('#div-table').hide()
+        }
+    }
+</script>
+
+<script>
+    function mostrarMensajeCorrecto(mensaje) {
+        $.toast().reset('all')
+        $.toast({
+            heading: 'Success',
+            text: mensaje,
+            showHideTransition: 'slide',
+            icon: 'success',
+            position: 'top-center',
+            hideAfter: 5000,
+        })
+    }
+    function mostrarMensajeError(mensaje, tiempo = 5000) {
+        $.toast().reset('all')
+        $.toast({
+            heading: 'Error',
+            text: mensaje,
+            icon: 'error',
+            loader: true,
+            loaderBg: '#fff',
+            position: 'top-center',
+            hideAfter: tiempo,
+        })
+    }
+</script>
+<!-- 
+
+    Codigo_Matriz
+    Detalle_Json
+    Finalizo_Registro
+ -->
