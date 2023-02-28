@@ -19,6 +19,10 @@
 
 <link href="../EstilosConfiguraciones/css/jquery.toast.css" rel="stylesheet">
 <script src="../EstilosConfiguraciones/js/jquery.toast.js"></script>
+
+
+
+
 <style>
     #loading {
         background: #000000e0;
@@ -207,3 +211,5 @@
 
 
 </script>
+
+

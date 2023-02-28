@@ -216,10 +216,12 @@
                 </div>
             </div>
             <div class="card-footer text-center">
-                <button type="button" class="btn btn-info" onclick="guardarEvaluacion()">Guardar</button>
-                <button type="button" class="btn btn-success" onclick="validarCamposEnviar()"
+                <button type="button" class="btn btn-info btn-accion"
+                    onclick="guardarEvaluacion('Guardar')">Guardar</button>
+                <button type="button" class="btn btn-success btn-accion" onclick="guardarEvaluacion('ENVIAR')"
                     id="btn-guardarGen">Guardar y Enviar</button>
-                <button type="button" class="btn btn-danger text-white" onclick="redirigirPagina()">Cancelar</button>
+                <button type="button" class="btn btn-danger text-white btn-accion"
+                    onclick="redirigirPagina()">Cancelar</button>
             </div>
         </div>
     </div>
@@ -286,7 +288,7 @@
     function consultarCompetenciaModulo() {
         var result = getDataSp({
             listaNombre: 'CompetenciaModulo',
-            colums: '*,Competencia/ID', filter: `Competencia/ID  eq '${_solicitid.CompetenciaId}'`,
+            colums: '*,Competencia/ID', filter: `Competencia/ID  eq '${_solicitid.CompetenciaId}' and Activo eq 'SI'`,
             expand: 'Competencia', orderColum: "ID",
             orderType: "asc"
         })
@@ -411,10 +413,22 @@
         var preguntasMayorCero = detalleEvaluacion[indexModulo].preguntas.filter(e => e.valor > 0).length
         var contPreguntas = detalleEvaluacion[indexModulo].preguntas.length
         var porcentaje = (preguntasMayorCero * 100) / contPreguntas
-        detalleEvaluacion[indexModulo].porcentaje = porcentaje
-
+        detalleEvaluacion[indexModulo].porcentaje = porcentaje        
+        var suma = 0
+        var _preguntasA = detalleEvaluacion[indexModulo].preguntas
+        _preguntasA.forEach(e => {
+            suma += Number(e.valor)
+        })
+        
+        var promedio = suma / _preguntasA.length
+        
+        
+        detalleEvaluacion[indexModulo].valor = promedio
+        
+        
+        
+        
         $(`#porcenaje-modulo-${idModulo}`).text(porcentaje + '%')
-
     }
 
     function obtenerParametroUrl(parametro) {
@@ -426,25 +440,48 @@
 
 
 
-<script>
+<script type="text/javascript">
+    var tipoEjecucion = '';
 
-    function guardarEvaluacion() {
+    function guardarEvaluacion(tipoAccion) {
+        tipoEjecucion = tipoAccion
         var soli = {}
-
+        var noCompletado = 0
+        var evaluacion = [...detalleEvaluacion]
         for (var i = 0; i < 10; i++) {
             var id = i + 1
-            var registro = detalleEvaluacion[i]
+            var registro = evaluacion[i]
             if (registro) {
                 var preguntas = registro.preguntas
+                var encabezado = {
+                    id:registro.id,
+                    titulo:registro.titulo,
+                    valor:registro.valor,
+                    porcentaje:registro.porcentaje
+                }
+                
 
-                delete registro.preguntas
-                soli[`Competencia_${id}`] = JSON.stringify(registro)
+                
+                soli[`Competencia_${id}`] = JSON.stringify(encabezado)
                 soli[`Competencia_Detalle_${id}`] = JSON.stringify(preguntas || [])
+
+                if (registro.porcentaje < 100) noCompletado++
             }
         }
 
+        if (tipoAccion == 'ENVIAR') {
+            if (noCompletado > 0) {
+                mostrarAlert({
+                    typeAlert: 'error',
+                    message: 'Todas la competencias deben tener tener 100%',
+                    time: 9000
+                })
+                return
+            }
+            soli.Finalizo_Evaluacion = 'SI'
+        }
+        
         $('#loading').show()
-
         setTimeout(() => {
             actualizarSolicitud(soli)
         }, 300)
@@ -454,7 +491,19 @@
         var result = updateItemSp({ solicitudUpdate: registro, listaNombre: 'EventoEvaluacionColaborador', idSolicitud: _solicitid.ID })
         if (result.ok) {
             $('#loading').hide()
-            mostrarAlert({ typeAlert: 'success', message: 'Se ha guardado la información exitosamente' })
+
+            if (tipoEjecucion == 'ENVIAR') {
+                $('.btn-accion').attr('disabled', true)
+                mostrarAlert({ message: 'Se ha finalizado la evaluacion exitosamente' })
+
+                setTimeout(() => { redirigirPagina() }, 2500);
+
+
+
+            } else {
+                mostrarAlert({ typeAlert: 'success', message: 'Se ha guardado la información exitosamente' })
+            }
+
         } else {
             $('#loading').hide()
             mostrarAlert({ typeAlert: 'error', message: result.message, time: 9000 })
@@ -475,100 +524,3 @@
 </script>
 
 
-<style>
-    .alert-float-right {
-        position: fixed;
-        left: 0px;
-        right: 0px;
-        top: 85px;
-        margin: auto;
-        width: max-content;
-        display: none;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        max-width: 500px;
-    }
-</style>
-
-<div class="alert alert-danger alert-float-right  alert-error " role="alert">
-    <div class="d-flex aling-item-center">
-        <strong class="d-flex aling-item-center align-self-center mr-3">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                class="bi bi-x-circle-fill" viewBox="0 0 16 16">
-                <path
-                    d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z" />
-            </svg>
-        </strong>
-        <span class="message-alert" id="message-error">
-
-        </span>
-    </div>
-
-    <strong class="pl-4 d-flex aling-item-center cursor-pointer" onclick="ocultarAlert()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-x"
-            viewBox="0 0 16 16">
-            <path
-                d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
-        </svg>
-    </strong>
-</div>
-
-
-<div class="alert alert-success alert-float-right  alert-success" role="alert">
-    <div class="d-flex aling-item-center">
-        <strong class="d-flex aling-item-center align-self-center mr-3">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                class="bi bi-check-circle-fill" viewBox="0 0 16 16">
-                <path
-                    d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
-            </svg>
-        </strong>
-        <span class="message-alert" id="message-success">
-
-        </span>
-    </div>
-
-    <strong class="pl-4 d-flex aling-item-center cursor-pointer" onclick="ocultarAlert()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-x"
-            viewBox="0 0 16 16">
-            <path
-                d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
-        </svg>
-    </strong>
-</div>
-
-
-<script>
-    var timeout;
-    function mostrarAlert({ typeAlert = 'success', time = 5000, message = '' }) {
-        clearTimeout(timeout)
-        $('.alert').hide()
-        $('.message-alert').text('')
-
-        switch (typeAlert) {
-            case 'success':
-                $('#message-success').text(message)
-                $('.alert-success').fadeIn(500)
-                break
-            case 'error':
-                $('#message-error').text(message)
-                $('.alert-error').fadeIn(500)
-                break
-            default:
-                $('#message-success').text(message)
-                $('.alert-success').fadeIn(500)
-                break
-        }
-        timeout = setTimeout(() => {
-            clearTimeout(timeout)
-            $('.alert').fadeOut("slow")
-        }, time)
-    }
-
-    function ocultarAlert() {
-        clearTimeout(timeout)
-        $('.alert').hide()
-    }
-    ocultarAlert()
-</script>

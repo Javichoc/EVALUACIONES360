@@ -1,4 +1,3 @@
-
 <link href="../EstilosConfiguraciones/CSS/style.css" rel="stylesheet">
 
 <link href="../EstilosConfiguraciones/CSS/bootstrap.min.css" rel="stylesheet">
@@ -61,7 +60,8 @@
 
 
 <style>
-    .card-header {
+    .card-header,
+    .modal-header {
         background-color: #222;
     }
 
@@ -157,6 +157,31 @@
     </div>
 </section>
 
+
+<div class="modal fade" id="modalResumenCarga" tabindex="-1" role="dialog" aria-labelledby="modalResumenCargaTitle"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <h5 class="modal-title text-white" id="exampleModalLongTitle">Resumen Carga</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <label for="">Se ha completado la carga exitosamente, total registros: <strong id="numRegsitros">0</strong>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 <script>
     var _usuriosBD = []
     var _matrizEvaluadores = []
@@ -240,6 +265,9 @@
                 })
             $('#txtUsuarios').val(null)
             validarDataExcel(usuariosExcel)
+
+            $('#numRegsitros').text(_dataExcel.length)
+            $('#modalResumenCarga').modal('show')
             $('#loading').hide()
         }
     }
@@ -254,8 +282,8 @@
             var descripcionError = []
 
             var infoEvaluador = {
-                cedula:'',
-                nombre:''
+                cedula: '',
+                nombre: ''
             };
 
             if (!usuario) {
@@ -274,7 +302,7 @@
 
                     infoEvaluador.cedula = jefe ? jefe?.cedulaEvaluador : ''
                     infoEvaluador.nombre = jefe ? jefe?.nombreEvaluador : ''
-                    
+
                 }
             }
 
@@ -314,6 +342,8 @@
         _dataExcel = [..._dataExcel, ...dataValidada]
 
         lledarTabla()
+
+
     }
 
     function lledarTabla() {
@@ -372,8 +402,8 @@
             var resourceContent = data;
             var dataArray = data.split(';').filter(e => e != '')
             dataArray.forEach(e => {
-                var [nombreUsuario,emailUsuario,cedulaUsuario, cargo, departamento,nombreEvaluador, emailEvaluador] = e.split(',')
-                _usuriosBD.push({ nombreUsuario,emailUsuario,cedulaUsuario, cargo, departamento,nombreEvaluador, emailEvaluador })
+                var [nombreUsuario, emailUsuario, cedulaUsuario, cargo, departamento, nombreEvaluador, emailEvaluador] = e.split(',')
+                _usuriosBD.push({ nombreUsuario, emailUsuario, cedulaUsuario, cargo, departamento, nombreEvaluador, emailEvaluador })
             });
         });
     }
