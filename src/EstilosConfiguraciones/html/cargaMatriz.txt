@@ -220,20 +220,20 @@
     }
 
     function LeerArchivoExcel() {
-        $('#loading').show()
         var target = $('#txtUsuarios')[0];
         var files_Cont = target.files;
         if (files_Cont.length === 0) {
-            mostrarMensajeError("Debe seleccionar un archivo");
+            mostrarAlert({message:"Debe seleccionar un archivo",typeAlert:'error'});
             return;
         }
         var filename = files_Cont[0].name;
         var allowedExtensions = /(.xlsx|.xls)$/i;
         if (!allowedExtensions.exec(filename)) {
             $('#txtUsuarios').val(null)
-            mostrarMensajeError("Debe seleccionar un archivo excel");
+            mostrarAlert({message:"Debe seleccionar un archivo excel",typeAlert:'error'});
             return;
         }
+        $('#loading').show()
         var name = target.name;
         var hojas = [];
         var usuariosExcel = [];
@@ -451,11 +451,11 @@
         var registro = {}
 
         if ($('#ddlCodigoMatriz').val() == '') {
-            mostrarMensajeError('Debe seleccionar un código matriz')
+            mostrarAlert({message:'Debe seleccionar un código matriz',typeAlert:'error'})
             return
         }
         if (_dataExcel.length == 0) {
-            mostrarMensajeError('Debe ingresar al menos un colaborador')
+            mostrarAlert({message:'Debe ingresar al menos un colaborador',typeAlert:'error'})
             return
         }
         $('#loading').show()
@@ -468,12 +468,12 @@
         if (_idRegistroExistente != '') {
             var result = actualizarRegistro(registro)
             if (result) {
-                mostrarMensajeCorrecto('El registro se actualizo correctamente')
+                mostrarAlert({message:'El registro se actualizo correctamente'})
             }
         } else {
             var result = crearRegistro(registro)
             if (result) {
-                mostrarMensajeCorrecto('El registro se creo y actualizo correctamente')
+                mostrarAlert({message:'El registro se creo y actualizo correctamente'})
             }
         }
         $('#loading').hide()
@@ -485,17 +485,17 @@
         var registro = {}
 
         if ($('#ddlCodigoMatriz').val() == '') {
-            mostrarMensajeError('Debe seleccionar un código matriz')
+            mostrarAlert({message:'Debe seleccionar un código matriz',typeAlert:'error'})
             return
         }
 
         if (_dataExcel.length == 0) {
-            mostrarMensajeError('Debe ingresar al menos un colaborador')
+            mostrarAlert({message:'Debe ingresar al menos un colaborador',typeAlert:'error'})
             return
         }
         var listaErrores = _dataExcel.filter(e => e.observaciones != '')
         if (listaErrores.length > 0) {
-            mostrarMensajeError('Algunos registros contienen errores')
+            mostrarAlert({message:'Algunos registros contienen errores',typeAlert:'error'})
             return
         }
         $('#loading').show()
@@ -508,14 +508,14 @@
         if (_idRegistroExistente != '') {
             var result = actualizarRegistro(registro)
             if (result) {
-                mostrarMensajeCorrecto('El registro se genero correctamente')
+                mostrarAlert({message:'El registro se genero correctamente'})
                 $('#ddlCodigoMatriz').val('')
 
             }
         } else {
             var result = crearRegistro(registro)
             if (result) {
-                mostrarMensajeCorrecto('El registro se se genero correctamente')
+                mostrarAlert({message:'El registro se se genero correctamente'})
                 $('#ddlCodigoMatriz').val('')
             }
         }
@@ -546,35 +546,3 @@
 
 
 </script>
-
-<script>
-    function mostrarMensajeCorrecto(mensaje) {
-        $.toast().reset('all')
-        $.toast({
-            heading: 'Success',
-            text: mensaje,
-            showHideTransition: 'slide',
-            icon: 'success',
-            position: 'top-center',
-            hideAfter: 5000,
-        })
-    }
-    function mostrarMensajeError(mensaje, tiempo = 3000) {
-        $.toast().reset('all')
-        $.toast({
-            heading: 'Error',
-            text: mensaje,
-            icon: 'error',
-            loader: true,
-            loaderBg: '#fff',
-            position: 'top-center',
-            hideAfter: tiempo,
-        })
-    }
-</script>
-<!-- 
-
-    Codigo_Matriz
-    Detalle_Json
-    Finalizo_Registro
- -->
