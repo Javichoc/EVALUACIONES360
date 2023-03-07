@@ -93,7 +93,8 @@
     input[type=text][disabled] {
         background-color: #e9ecef;
     }
-    button[disabled][disabled]{
+
+    button[disabled][disabled] {
         color: #fff;
         cursor: not-allowed;
     }
@@ -202,8 +203,9 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="ddlMatrizEvaluadores" class="control-label font-weight-bold" >Matriz Evaluadores:</label>
-                    <select id="ddlMatrizEvaluadores" class="form-control form-control-sm border cls-controls" onchange="cambioMatriz()">
+                    <label for="ddlMatrizEvaluadores" class="control-label font-weight-bold">Matriz Evaluadores:</label>
+                    <select id="ddlMatrizEvaluadores" class="form-control form-control-sm border cls-controls"
+                        onchange="cambioMatriz()">
                         <option value="">---Seleeccione---</option>
                     </select>
                 </div>
@@ -458,7 +460,26 @@
 
 
 
+    function getMondays(startDate, endDate) {
+        var result = []
+        var currentDate = new Date(startDate)
+
+        while (currentDate <= endDate) {
+            if (currentDate.getDay() === 1) {
+                result.push(new Date(currentDate))
+            }
+            currentDate.setDate(currentDate.getDate() + 1)
+        }
+        var lunesString = result.map(e => new Date(e).format('yyyy-MM-dd') + 'T12:00Z').join(';')
+        return lunesString || ''
+    }
+    
+
+
     function createListItems() {
+        var mondays = getMondays(new Date($('#txtFechaInicio').val()), new Date($('#txtFechaFin').val()))
+    
+    
         var matriz = _matrizEvaluadores.find(e => e.ID == $('#ddlMatrizEvaluadores').val())
         var data = JSON.parse(matriz.Detalle_Json || '[]')
 
@@ -481,6 +502,8 @@
             oListItem.set_item('Matriz_Evaluaddores', $('#ddlMatrizEvaluadores').val())
             oListItem.set_item('Competencia', $('#ddlCompetenciaPregunta').val())
             oListItem.set_item('EventoEvaluacion', _idRegistroExistente)
+            oListItem.set_item('NotificacionEntreRango', mondays)
+            
             oListItem.update()
         });
         clientContext.executeQueryAsync(onQuerySucceeded, onQueryFailed);
@@ -494,7 +517,7 @@
 
         $('#loading').hide()
         mostrarMensajeCorrecto('Se ha generado el evento evaluación correctamente')
-        
+
         setTimeout(() => {
             window.location.href = "../SitePages/ListarEventosEvaluacion.aspx";
         }, 2000);
@@ -537,9 +560,9 @@
         let params = new URLSearchParams(location.search);
         return params.get(parametro);
     }
-    
-    
-    
+
+
+
     function cambioMatriz() {
         var data = []
         if ($('#ddlMatrizEvaluadores').val() != '') {
@@ -558,7 +581,7 @@
         $('#tableUsuarios').DataTable({
             data: data,
             columns: [
-                
+
                 { data: 'nombreUsuario', title: 'Nombre evaluado' },
                 { data: 'emailUsuario', title: 'Email evaluado' },
                 { data: 'rol', title: 'Rol' },

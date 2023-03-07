@@ -266,7 +266,7 @@
             $('#txtUsuarios').val(null)
             validarDataExcel(usuariosExcel)
 
-            $('#numRegsitros').text(_dataExcel.length)
+            
             $('#modalResumenCarga').modal('show')
             $('#loading').hide()
         }
@@ -276,7 +276,7 @@
         var dataValidada = []
         data.forEach(e => {
             var usuario = _usuriosBD.find(u => u.emailUsuario == e.emailUsuario)
-            var jefe = _usuriosBD.find(u => u.emailEvaluador == e.emailEvaluador)
+            var jefe = _usuriosBD.find(u => u.emailUsuario == e.emailEvaluador)
             var rol = _roles.find(r => r.Title.toLowerCase() == e.rol.toLowerCase())
             var duplicado = _dataExcel.find(u => u.emailUsuario == e.emailUsuario)
             var descripcionError = []
@@ -300,8 +300,8 @@
                     descripcionError.push(`no se encuenta la información del evaluador: ${e.emailEvaluador}`)
                 } else {
 
-                    infoEvaluador.cedula = jefe ? jefe?.cedulaEvaluador : ''
-                    infoEvaluador.nombre = jefe ? jefe?.nombreEvaluador : ''
+                    infoEvaluador.cedula = jefe ? jefe?.cedulaUsuario : ''
+                    infoEvaluador.nombre = jefe ? jefe?.nombreUsuario : ''
 
                 }
             }
@@ -338,7 +338,7 @@
             }
         });
 
-
+        $('#numRegsitros').text(dataValidada.length)
         _dataExcel = [..._dataExcel, ...dataValidada]
 
         lledarTabla()
